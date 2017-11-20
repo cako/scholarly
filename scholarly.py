@@ -17,6 +17,7 @@ import re
 import requests
 import sys
 import time
+import functools
 
 _GOOGLEID = hashlib.md5(str(random.random()).encode('utf-8')).hexdigest()[:16]
 _COOKIES = {'GSP': 'ID={0}:CF=4'.format(_GOOGLEID)}
@@ -41,6 +42,7 @@ _EMAILAUTHORRE = r'Verified email at '
 
 _SESSION = requests.Session()
 _PAGESIZE = 100
+_MAXSIZE = None
 
 
 def _handle_captcha(url):
@@ -67,6 +69,7 @@ def _handle_captcha(url):
     return resp_captcha.url
 
 
+@functools.lru_cache(maxsize=_MAXSIZE)
 def _get_page(pagerequest):
     """Return the data for a page on scholar.google.com"""
     # Note that we include a sleep to avoid overloading the scholar server
